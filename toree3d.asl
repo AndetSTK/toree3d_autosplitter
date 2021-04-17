@@ -1,7 +1,7 @@
 state("Toree3D")
 {
-	int markerA : "UnityPlayer.dll", 0x11AC740, 0x308, 0x140, 0x38, 0x8;         //2 if in level, 3 if in menu
-	int markerB : "UnityPlayer.dll", 0x11AC740, 0x308, 0x180, 0xF8, 0x8;         //2 if victory cutscene not playing, 3 if victory cutscene playing
+	int markerA : "UnityPlayer.dll", 0x118AD80, 0xE40, 0xD4, 0x7C, 0x38;         //2 if in level, 3 if in menu
+	int markerB : "UnityPlayer.dll", 0x118AD80, 0xDF8, 0x1C4, 0x58, 0x1E8;       //2 if victory cutscene not playing, 3 if victory cutscene playing
 	int paused : "UnityPlayer.dll", 0x11AC740, 0x1E4, 0x34, 0x0, 0x4A8;          //0 if not paused, 1 if paused
 	float time : "UnityPlayer.dll", 0x11B58E0, 0x125C;                           //elapsed time after starting a level
 }
