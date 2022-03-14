@@ -1,11 +1,11 @@
 state("Toree3D")
 {
-	int markerA : "UnityPlayer.dll", 0x118AD80, 0xE40, 0xD4, 0x7C, 0x38;         //2 if in level, 3 if in menu
-	int markerB : "UnityPlayer.dll", 0x118AD80, 0xDF8, 0x1C4, 0x58, 0x1E8;       //2 if victory cutscene not playing, 3 if victory cutscene playing
-	int paused : "UnityPlayer.dll", 0x11AC740, 0x1E4, 0x34, 0x0, 0x4A8;          //0 if not paused, 1 if paused
-	float time : "UnityPlayer.dll", 0x11B58E0, 0x125C;                           //elapsed time after starting a level
+	int markerA : "UnityPlayer.dll", 0x01671E80, 0xD0, 0x08, 0x18, 0x260, 0x10, 0x50, 0x0C;				//2 if in level, 3 if in menu
+	int markerB : "UnityPlayer.dll", 0x01679830, 0x5A8, 0xF0, 0x3D8, 0x1C0, 0x4E0, 0x10, 0x50, 0x0C;	//2 if victory cutscene not playing, 3 if victory cutscene playing
+	int paused : "UnityPlayer.dll", 0x016394B8, 0x150, 0x20, 0x20, 0x740, 0x18, 0x88;          			//0 if not paused, 1 if paused
+	float time : "UnityPlayer.dll", 0x01679830, 0x5A0, 0x70, 0x1B0, 0x70, 0x28, 0x74;					//elapsed time after starting a level
 }
-
+ 
 startup
 {
 	settings.Add("split_early", false, "Split immediately upon level completion");
@@ -15,6 +15,8 @@ init
 {
 	vars.ready = 0;
 	vars.willSplit = 0;
+	// Keep track of total run based on game time. (Stored in milliseconds)
+	vars.savedTime = 0;
 }
 
 update
@@ -41,5 +43,29 @@ split
 
 reset
 {
-	return (old.time > current.time) && (timer.CurrentSplitIndex == 0) && (vars.willSplit == 0);
+	if (old.time > current.time && timer.CurrentSplitIndex == 0 && vars.willSplit == 0) {
+		vars.savedTime = 0;
+		return true;
+	}
+	return false;
+}
+
+gameTime
+{
+	// Pause game time while on menu
+	if (current.markerA != 2)
+	{
+		timer.SetGameTime(new TimeSpan(0));
+		return TimeSpan.FromMilliseconds(vars.savedTime);
+	}
+
+	// gameTime is frames rendered. Game runs at 60 fps
+	float ms = current.time * 1000f;
+	float oldMs = old.time * 1000f;
+	if (ms >= oldMs)
+	{
+		vars.savedTime += ms - oldMs;
+	}
+
+	return TimeSpan.FromMilliseconds(Math.Round(vars.savedTime));
 }
